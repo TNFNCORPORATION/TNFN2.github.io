@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOROS NEGROS FIGHT NIGHT 2</title>
+    <style>
+        /* =========================================
+           ESTILOS GENERALES
+        ========================================= */
+        body {
+            background-color: #f0f0f0; /* Fondo gris claro para resaltar las tarjetas blancas */
+            color: #000;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        /* Logo superior izquierdo */
+        .logo-top-left {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 80px; /* Ajusta el tamaño de tu logo aquí */
+            height: auto;
+            z-index: 1000;
+        }
+
+        /* Título Principal */
+        h1 {
+            font-size: 3em;
+            font-weight: 900;
+            margin-top: 20px;
+            margin-bottom: 5px;
+            text-align: center;
+            color: #111;
+        }
+
+        .fecha-global {
+            font-size: 1.2em;
+            color: #555;
+            margin-bottom: 40px;
+            font-weight: bold;
+        }
+
+        /* Control de Audio */
+        .audio-control {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            font-size: 24px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+            border: 2px solid #D20A0A;
+            transition: transform 0.2s;
+        }
+        .audio-control:hover {
+            transform: scale(1.1);
+        }
+
+        /* =========================================
+           ESTILOS DE LA TARJETA (UFC STYLE)
+        ========================================= */
+        .tarjeta-pelea {
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 1000px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            cursor: pointer;
+            overflow: hidden;
+            border-top: 4px solid #eee;
+            border-bottom: 1px solid #ccc;
+        }
+
+        /* --- VISTA CERRADA --- */
+        .vista-cerrada {
+            display: flex;
+            flex-direction: column;
+            padding: 15px 20px 10px 20px;
+        }
+
+        .categoria-titulo {
+            text-align: center;
+            font-weight: bold;
+            color: #666;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .luchadores-cerrado {
+            display: flex;
+            justify-content: space-between;
+            align-items: center; /* Alineación centrada para que el VS quede bien */
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .luchador-bloque {
+            display: flex;
+            align-items: center;
+            width: 45%; 
+            min-width: 0; /* MAGIA: Evita que el texto empuje y rompa el diseño */
+        }
+
+        .luchador-bloque.der {
+            flex-direction: row-reverse;
+        }
+
+        /* TAMAÑO ESTRICTO PARA LAS IMÁGENES */
+        .foto-mitad {
+            width: 100px;
+            min-width: 100px; /* Obliga a que NO se haga más chica */
+            max-width: 100px; /* Obliga a que NO se haga más grande */
+            height: 100px;
+            object-fit: cover;
+            object-position: center top;
+            background-color: #fff;
+            border-radius: 5px;
+            flex-shrink: 0; /* Prohíbe que el navegador la aplaste */
+        }
+
+        .nombre-info {
+            display: flex;
+            flex-direction: column;
+            margin: 0 15px;
+            flex: 1; /* Toma el espacio sobrante sin afectar la imagen */
+            min-width: 0;
+        }
+
+        /* Alineamos el contenido a la izquierda y derecha para arreglar el recuadro "C" */
+        .luchador-bloque.izq .nombre-info {
+            align-items: flex-start;
+            text-align: left;
+        }
+
+        .luchador-bloque.der .nombre-info {
+            align-items: flex-end;
+            text-align: right;
+        }
+
+        .indicador {
+            font-size: 0.9em;
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: inline-block;
+        }
+        
+        .rank { color: #888; }
+        
+        .champ { 
+            background-color: #d4af37; 
+            color: white; 
+            padding: 3px 8px; 
+            border-radius: 3px; 
+            display: inline-block; /* Evita que se estire */
+        }
+
+        .nombre {
+            font-size: 1.4em; /* Un poco más pequeño para que quepa mejor */
+            font-weight: 900;
+            text-transform: uppercase;
+            color: #000;
+            margin: 0;
+            white-space: normal; /* Si el nombre es muy largo, lo pasa a una segunda línea */
+            word-wrap: break-word;
+        }
+
+        .vs-cerrado {
+            font-size: 1.5em;
+            font-weight: 900;
+            color: #000;
+            margin: 0 10px;
+            flex-shrink: 0;
+        }
+
+        /* Banderas Inferiores */
+        .banderas-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 10px;
+            font-weight: 900;
+            font-size: 0.9em;
+            text-transform: uppercase;
+        }
+
+        /* Banderas Inferiores */
+        .banderas-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 10px;
+            font-weight: 900;
+            font-size: 0.9em;
+            text-transform: uppercase;
+        }
+        .bandera-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .bandera-img {
+            width: 25px;
+            height: auto;
+            border: 1px solid #ddd;
+        }
+
+        /* --- VISTA ABIERTA (ANIMADA) --- */
+        .vista-abierta {
+            max-height: 0;
+            opacity: 0;
+            visibility: hidden;
+            transition: max-height 0.6s ease, opacity 0.6s ease, visibility 0.6s;
+            background-color: #fff;
+            position: relative;
+        }
+
+        /* CUANDO LA TARJETA SE ACTIVA (CLIC) */
+        .tarjeta-pelea.activa .vista-cerrada {
+            display: none; /* Oculta la vista cerrada instantáneamente */
+        }
+        .tarjeta-pelea.activa .vista-abierta {
+            max-height: 800px; /* Altura suficiente para mostrar el contenido */
+            opacity: 1;
+            visibility: visible;
+            padding: 20px;
+        }
+
+        .header-abierto {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .header-abierto .nombre { font-size: 1.8em; }
+        .linea-roja { border-bottom: 3px solid #D20A0A; padding-bottom: 5px; }
+        .linea-azul { border-bottom: 3px solid #0055a4; padding-bottom: 5px; }
+
+        /* Contenedor de fotos completas y tabla */
+        .contenido-abierto {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            height: 400px;
+        }
+
+        /* Animación de las fotos desde el centro hacia los lados */
+        .foto-full {
+            position: absolute;
+            bottom: 0;
+            height: 100%;
+            width: auto;
+            object-fit: contain;
+            transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        
+        /* Posiciones iniciales (en el centro) */
+        .foto-full.izq { left: 0; transform: translateX(150%); opacity: 0; }
+        .foto-full.der { right: 0; transform: translateX(-150%); opacity: 0; }
+
+        /* Posiciones finales (a los lados) */
+        .tarjeta-pelea.activa .foto-full.izq { transform: translateX(0); opacity: 1; }
+        .tarjeta-pelea.activa .foto-full.der { transform: translateX(0); opacity: 1; }
+
+        /* Tabla de estadísticas central */
+        .tabla-stats {
+            width: 40%;
+            margin: 0 auto;
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 1s ease 0.3s; /* Aparece después de que las fotos se mueven */
+        }
+        .tarjeta-pelea.activa .tabla-stats {
+            opacity: 1;
+        }
+
+        .fila-stat {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 1.1em;
+        }
+        .fila-stat:last-child { border-bottom: none; }
+        
+        .stat-rojo { color: #D20A0A; font-weight: bold; width: 33%; text-align: left; }
+        .stat-label { color: #888; font-weight: bold; width: 34%; text-align: center; text-transform: uppercase; font-size: 0.9em; }
+        .stat-azul { color: #0055a4; font-weight: bold; width: 33%; text-align: right; }
+
+        .footer-corporation {
+            text-align: center;
+            margin-top: 60px;
+            padding: 30px 20px;
+            color: #888; /* Un gris sutil para que no resalte más que las peleas */
+            font-size: 0.9em;
+            width: 100%;
+            border-top: 1px solid #ccc; /* Una línea delgada arriba para separarlo */
+        }
+
+        .footer-corporation p {
+            margin: 5px 0;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- LOGO SUPERIOR IZQUIERDO -->
+    <img src="logo.png" alt="Logo" class="logo-top-left">
+
+    <!-- AUDIO Y BOTÓN -->
+    <audio id="bgMusic" loop>
+        <source src="soundtrack.wav" type="audio/wav">
+    </audio>
+    <div id="audioBtn" class="audio-control" title="Música">🔇</div>
+
+    <h1>TOROS NEGROS FIGHT NIGHT 2</h1>
+    <div class="fecha-global">DOMINGO 9 DE AGOSTO - 6:00 PM (PERÚ)</div>
+
+    <!-- =========================================
+         PELEA 1 (EVENTO PRINCIPAL)
+    ========================================= -->
+    <div class="tarjeta-pelea" onclick="toggleTarjeta(this)">
+        
+        <!-- VISTA CERRADA -->
+        <div class="vista-cerrada">
+            <div class="categoria-titulo">Peso Pesado Title Bout</div>
+            
+            <div class="luchadores-cerrado">
+                <div class="luchador-bloque izq">
+                    <img src="lopez.jpg" class="foto-mitad" alt="Lopez">
+                    <div class="nombre-info">
+                        <span class="indicador rank">#1</span>
+                        <h2 class="nombre">SEBASTIAN LOPEZ</h2>
+                    </div>
+                </div>
+                
+                <div class="vs-cerrado">VS</div>
+                
+                <div class="luchador-bloque der">
+                    <img src="LuisHinostroza.jpg" class="foto-mitad" alt="Hinostroza">
+                    <div class="nombre-info">
+                        <span class="indicador rank">#2</span>
+                        <h2 class="nombre">LUIS HINOSTROZA</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="banderas-footer">
+                <div class="bandera-item"><img src="peru.png" class="bandera-img"> PERÚ</div>
+                <div class="bandera-item" style="color: #666; font-size: 0.8em;">POSIBILIDADES</div>
+                <div class="bandera-item">PERÚ <img src="peru.png" class="bandera-img"></div>
+            </div>
+        </div>
+
+        <!-- VISTA ABIERTA (ANIMADA) -->
+        <div class="vista-abierta">
+            <div class="header-abierto">
+                <h2 class="nombre linea-roja">SEBASTIAN LOPEZ</h2>
+                <div class="categoria-titulo" style="margin-top: 10px;">PESO PESADO TITLE BOUT</div>
+                <h2 class="nombre linea-azul">LUIS HINOSTROZA</h2>
+            </div>
+            
+            <div class="contenido-abierto">
+                <!-- FOTOS COMPLETAS (DIFERENTES) -->
+                <img src="sebascompleto.png" class="foto-full izq" alt="Lopez Full">
+                
+                <div class="tabla-stats">
+                    <div class="fila-stat">
+                        <div class="stat-rojo">0-0-0</div>
+                        <div class="stat-label">RECORD</div>
+                        <div class="stat-azul">0-0-1</div>
+                    </div>
+                    <div class="fila-stat">
+                        <div class="stat-rojo">18</div>
+                        <div class="stat-label">EDAD</div>
+                        <div class="stat-azul">18</div>
+                    </div>
+                    <div class="fila-stat">
+                        <div class="stat-rojo">1.60 m</div>
+                        <div class="stat-label">ALTURA</div>
+                        <div class="stat-azul">1.68 m</div>
+                    </div>
+                    <div class="fila-stat">
+                        <div class="stat-rojo">108 kg</div>
+                        <div class="stat-label">PESO</div>
+                        <div class="stat-azul">92 kg</div>
+                    </div>
+                    <div class="fila-stat">
+                        <div class="stat-rojo">1.65 m</div>
+                        <div class="stat-label">ALCANCE</div>
+                        <div class="stat-azul">1.70 m</div>
+                    </div>
+                </div>
+
+                <img src="luiscompleto.png" class="foto-full der" alt="Hinostroza Full">
+            </div>
+        </div>
+    </div>
+
+
+    <!-- =========================================
+         PELEA 2 (CO-ESTELAR) - CARLOS VIDAL CON "C"
+    ========================================= -->
+    <div class="tarjeta-pelea" onclick="toggleTarjeta(this)">
+        
+        <div class="vista-cerrada">
+            <div class="categoria-titulo">Peso Wélter Title Bout</div>
+            
+            <div class="luchadores-cerrado">
+                <div class="luchador-bloque izq">
+                    <img src="CarlosVidal2.jpg" class="foto-mitad" alt="Vidal">
+                    <div class="nombre-info">
+                        <span class="indicador champ">C</span> <!-- SÍMBOLO DE CAMPEÓN -->
+                        <h2 class="nombre">CARLOS VIDAL</h2>
+                    </div>
+                </div>
+                
+                <div class="vs-cerrado">VS</div>
+                
+                <div class="luchador-bloque der">
+                    <img src="david.png" class="foto-mitad" alt="Espinoza">
+                    <div class="nombre-info">
+                        <span class="indicador rank">#2</span>
+                        <h2 class="nombre">DAVID ESPINOZA</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="banderas-footer">
+                <div class="bandera-item"><img src="peru.png" class="bandera-img"> PERÚ</div>
+                <div class="bandera-item" style="color: #666; font-size: 0.8em;">POSIBILIDADES</div>
+                <div class="bandera-item">PERÚ <img src="peru.png" class="bandera-img"></div>
+            </div>
+        </div>
+
+        <div class="vista-abierta">
+            <div class="header-abierto">
+                <h2 class="nombre linea-roja">CARLOS VIDAL</h2>
+                <div class="categoria-titulo" style="margin-top: 10px;">PESO WÉLTER TITLE BOUT</div>
+                <h2 class="nombre linea-azul">DAVID ESPINOZA</h2>
+            </div>
+            
+            <div class="contenido-abierto">
+                <img src="carloscompleto.png" class="foto-full izq" alt="Vidal Full">
+                
+                <div class="tabla-stats">
+                    <div class="fila-stat">
+                        <div class="stat-rojo">2-0-0</div>
+                        <div class="stat-label">RECORD</div>
+                        <div class="stat-azul">0-0-0</div>
+                    </div>
+                    <div class="fila-stat">
+                        <div class="stat-rojo">19</div>
+                        <div class="stat-label">EDAD</div>
+                        <div class="stat-azul">19</div>
+                    </div>
+                    <div class="fila-stat">
+                        <div class="stat-rojo">1.75 m</div>
+                        <div class="stat-label">ALTURA</div>
+                        <div class="stat-azul">1.77 m</div>
+                    </div>
+                    <div class="fila-stat">
+                        <div class="stat-rojo">67 kg</div>
+                        <div class="stat-label">PESO</div>
+                        <div class="stat-azul">69 kg</div>
+                    </div>
+                    <div class="fila-stat">
+                        <div class="stat-rojo">1.80 m</div>
+                        <div class="stat-label">ALCANCE</div>
+                        <div class="stat-azul">1.82 m</div>
+                    </div>
+                </div>
+
+                <img src="davidcompleto.png" class="foto-full der" alt="Espinoza Full">
+            </div>
+        </div>
+    </div>
+
+
+    <!-- =========================================
+         PELEA 3 (LIGERO)
+    ========================================= -->
+    <div class="tarjeta-pelea" onclick="toggleTarjeta(this)">
+        
+        <div class="vista-cerrada">
+            <div class="categoria-titulo">Peso Ligero Bout</div>
+            
+            <div class="luchadores-cerrado">
+                <div class="luchador-bloque izq">
+                    <img src="ugarte.jpg" class="foto-mitad" alt="Ugarte">
+                    <div class="nombre-info">
+                        <span class="indicador rank">#1</span>
+                        <h2 class="nombre">JERMY UGARTE</h2>
+                    </div>
+                </div>
+                
+                <div class="vs-cerrado">VS</div>
+                
+                <div class="luchador-bloque der">
+                    <img src="julca.jpg" class="foto-mitad" alt="Julca">
+                    <div class="nombre-info">
+                        <span class="indicador rank">#2</span>
+                        <h2 class="nombre">MATÍAS JULCA</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="banderas-footer">
+                <div class="bandera-item"><img src="rusia.png" class="bandera-img"> RUSIA</div>
+                <div class="bandera-item" style="color: #666; font-size: 0.8em;">POSIBILIDADES</div>
+                <div class="bandera-item">PERÚ <img src="peru.png" class="bandera-img"></div>
+            </div>
+        </div>
+
+        <div class="vista-abierta">
+            <div class="header-abierto">
+                <h2 class="nombre linea-roja">JERMY UGARTE</h2>
+                <div class="categoria-titulo" style="margin-top: 10px;">PESO LIGERO BOUT</div>
+                <h2 class="nombre linea-azul">MATÍAS JULCA</h2>
+            </div>
+            
+            <div class="contenido-abierto">
+                <img src="jermycompleto.png" class="foto-full izq" alt="Ugarte Full">
+                
+                <div class="tabla-stats">
+                    <div class="fila-stat">
+                        <div class="stat-rojo">0-0-1</div>
+                        <div class="stat-label">RECORD</div>
+                        <div class="stat-azul">0-0-1</div>
+                    </div>
+                    <div class="fila-stat">
+                        <div class="stat-rojo">19</div>
+                        <div class="stat-label">EDAD</div>
+                        <div class="stat-azul">19</div>
+                    </div>
+                    <div class="fila-stat">
+                        <div class="stat-rojo">1.71 m</div>
+                        <div class="stat-label">ALTURA</div>
+                        <div class="stat-azul">1.73 m</div>
+                    </div>
+                    <div class="fila-stat">
+                        <div class="stat-rojo">65 kg</div>
+                        <div class="stat-label">PESO</div>
+                        <div class="stat-azul">63 kg</div>
+                    </div>
+                    <div class="fila-stat">
+                        <div class="stat-rojo">1.75 m</div>
+                        <div class="stat-label">ALCANCE</div>
+                        <div class="stat-azul">1.77 m</div>
+                    </div>
+                </div>
+
+                <img src="matiascompleto.png" class="foto-full der" alt="Julca Full">
+            </div>
+        </div>
+    </div>
+
+
+    <!-- =========================================
+         JAVASCRIPT (ANIMACIONES Y AUDIO)
+    ========================================= -->
+    <script>
+        // --- 1. Lógica de animación de tarjetas (Abrir / Cerrar) ---
+        function toggleTarjeta(elemento) {
+            // Si la tarjeta ya está activa, la cerramos
+            if (elemento.classList.contains('activa')) {
+                elemento.classList.remove('activa');
+            } else {
+                // Opcional: Cerrar las demás tarjetas si abres una nueva
+                const tarjetas = document.querySelectorAll('.tarjeta-pelea');
+                tarjetas.forEach(t => t.classList.remove('activa'));
+                
+                // Abrir la tarjeta actual
+                elemento.classList.add('activa');
+            }
+        }
+
+        // --- 2. Lógica de Audio (Reproducción automática y botón) ---
+        const music = document.getElementById('bgMusic');
+        const btn = document.getElementById('audioBtn');
+        let isPlaying = false;
+
+        function updateAudioIcon() {
+            if (isPlaying) {
+                btn.innerHTML = '🔊';
+                btn.style.borderColor = '#00FF00'; // Borde Verde
+            } else {
+                btn.innerHTML = '🔇';
+                btn.style.borderColor = '#D20A0A'; // Borde Rojo
+            }
+        }
+
+        // Intentar reproducir al cargar la página
+        window.addEventListener('load', function() {
+            music.volume = 0.3; // Volumen moderado
+            let playPromise = music.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(_ => {
+                    isPlaying = true;
+                    updateAudioIcon();
+                }).catch(error => {
+                    // Si el navegador bloquea el autoplay, espera el clic del usuario
+                    isPlaying = false;
+                    updateAudioIcon();
+                });
+            }
+        });
+
+        // Controlar el audio con el botón
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation(); // Evitar que el clic abra la tarjeta si el botón está sobre ella
+            if (isPlaying) {
+                music.pause();
+                isPlaying = false;
+            } else {
+                music.play();
+                isPlaying = true;
+            }
+            updateAudioIcon();
+        });
+    </script>
+
+    <!-- =========================================
+         PIE DE PÁGINA
+    ========================================= -->
+    <div class="footer-corporation">
+        <p>Toros Negros Corporation</p>
+        <p>Todos los derechos reservados &copy;</p>
+    </div>
+    
+</body>
+</html>
